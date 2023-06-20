@@ -14,9 +14,10 @@ const Signup = () => {
       .post("http://localhost:7070/api/user/new", { name, email })
       .then((res) => {
         alert(res.data.message);
-        localStorage.setItem("_id", res.data.user._id);
-        localStorage.setItem("email", res.data.user.email);
-        navigate("/chatRoom");
+        sessionStorage.setItem("_id", res.data.user._id);
+        sessionStorage.setItem("email", res.data.user.email);
+        sessionStorage.setItem("name", res.data.user.name);
+        navigate("/chatbox");
       })
       .catch((err) => alert(err.response.data.message));
   };
@@ -50,6 +51,7 @@ const Signup = () => {
             onChange={(e) => setEmail(e.target.value)}
             style={{ margin: "10px", padding: "10px" }}
           />
+          
         </div>
         <input
           type="submit"
