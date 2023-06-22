@@ -12,17 +12,13 @@ const Chatbox = () => {
   const [message, setMessage] = useState("");
   const [sender, setSender] = useState();
   const [senderName, setsenderName] = useState("");
-  const [receiver, setReceiver] = useState();
+  const [receiver, setReceiver] = useState("");
 
   useEffect(() => {
     socket = io.connect("http://localhost:7070");
-  }, []);
 
-  useEffect(() => {
     setSender(sessionStorage.getItem("_id"));
     setsenderName(sessionStorage.getItem("name"));
-
-    setReceiver(sessionStorage.getItem("receiver"));
 
     axios
       .get("http://localhost:7070/api/users")
@@ -30,6 +26,10 @@ const Chatbox = () => {
         setUsers(res.data.users);
       })
       .catch((err) => console.log(err.response.data.message));
+  }, []);
+
+  useEffect(() => {
+    setReceiver(sessionStorage.getItem("receiver"));
 
     if (receiver && receiver !== "") {
       axios
