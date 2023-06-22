@@ -3,7 +3,7 @@ import React, { Fragment, useEffect, useState } from "react";
 import ChatIcon from "../assets/ChatIcon.ico";
 import "./Chatbox.css";
 import io from "socket.io-client";
-const socket = io.connect("http://localhost:7070");
+var socket;
 
 const Chatbox = () => {
   const [isChatBox, setIsChatBox] = useState(false);
@@ -15,8 +15,14 @@ const Chatbox = () => {
   const [receiver, setReceiver] = useState();
 
   useEffect(() => {
+    socket = io.connect("http://localhost:7070");
+  }, []);
+
+  useEffect(() => {
     setSender(sessionStorage.getItem("_id"));
     setsenderName(sessionStorage.getItem("name"));
+
+    setReceiver(sessionStorage.getItem("receiver"));
 
     axios
       .get("http://localhost:7070/api/users")
@@ -29,7 +35,7 @@ const Chatbox = () => {
       axios
         .post("http://localhost:7070/api/messages/two", {
           sender: sessionStorage.getItem("_id"),
-          receiver,
+          receiver: sessionStorage.getItem("receiver"),
         })
         .then((res) => {
           setMessages(res.data.messages);
@@ -62,20 +68,16 @@ const Chatbox = () => {
   };
 
   useEffect(() => {
-    if (message === "") {
-      socket.on("message", (payload) => {
-        if (
-          sender === payload.sender._id ||
-          (sender === payload.receiver &&
-            sessionStorage.getItem("receiver") === payload.sender._id)
-        ) {
-          setMessages([...messages, payload]);
-        }
-        if (sender === payload.receiver) {
-          return alert(`New Message From ${payload.sender.name}`);
-        }
-      });
-    }
+    socket.on("message", (payload) => {
+      console.log("run");
+      if (
+        sender === payload.sender._id ||
+        (sender === payload.receiver &&
+          sessionStorage.getItem("receiver") === payload.sender._id)
+      ) {
+        setMessages([...messages, payload]);
+      }
+    });
   });
 
   return (
@@ -102,6 +104,7 @@ const Chatbox = () => {
                 }}
                 name="users"
                 id=""
+                value={receiver}
               >
                 <option value="">Select</option>
                 {users
