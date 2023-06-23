@@ -5,19 +5,23 @@ import { useNavigate } from "react-router-dom";
 const Signup = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const navigate = useNavigate();
 
   const signupUser = (e) => {
     e.preventDefault();
     axios
-      .post("http://localhost:7070/api/user/new", { name, email })
+      .post("http://localhost:7070/api/user/new", {
+        fullName: name,
+        email,
+        password,
+        confirmPassword,
+      })
       .then((res) => {
         alert(res.data.message);
-        sessionStorage.setItem("_id", res.data.user._id);
-        sessionStorage.setItem("email", res.data.user.email);
-        sessionStorage.setItem("name", res.data.user.name);
-        navigate("/chatbox");
+        // navigate("/chatbox");
       })
       .catch((err) => alert(err.response.data.message));
   };
@@ -51,8 +55,27 @@ const Signup = () => {
             onChange={(e) => setEmail(e.target.value)}
             style={{ margin: "10px", padding: "10px" }}
           />
-          
         </div>
+        <div>
+          <label htmlFor="">password</label>
+          <input
+            name="password"
+            type="text"
+            onChange={(e) => setPassword(e.target.value)}
+            style={{ margin: "10px", padding: "10px" }}
+          />
+        </div>
+
+        <div>
+          <label htmlFor="">confirm password</label>
+          <input
+            name="confirmPassword"
+            type="text"
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            style={{ margin: "10px", padding: "10px" }}
+          />
+        </div>
+
         <input
           type="submit"
           value="Sign Up"

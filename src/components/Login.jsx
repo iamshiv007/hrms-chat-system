@@ -3,22 +3,19 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
   const LoginUser = (e) => {
     e.preventDefault();
     axios
-      .post("http://localhost:7070/api/user/login", { name, email })
+      .post("http://localhost:7070/api/user/login", { email, password })
       .then((res) => {
         alert(res.data.message);
-        sessionStorage.setItem("_id", res.data.user._id);
-        sessionStorage.setItem("email", res.data.user.email);
-        sessionStorage.setItem("name", res.data.user.name);
-        navigate("/chatbox");
+        // navigate("/chatbox");
       })
-      .catch((err) => alert(err.response.data.message));
+      .catch((err) => console.log(err));
   };
 
   return (
@@ -34,20 +31,21 @@ const Login = () => {
     >
       <form action="" onSubmit={LoginUser}>
         <div>
-          <label htmlFor="">Name</label>
-          <input
-            name="name"
-            type="text"
-            onChange={(e) => setName(e.target.value)}
-            style={{ margin: "10px", padding: "10px" }}
-          />
-        </div>
-        <div>
           <label htmlFor="">email</label>
           <input
             name="email"
             type="text"
             onChange={(e) => setEmail(e.target.value)}
+            style={{ margin: "10px", padding: "10px" }}
+          />
+        </div>
+
+        <div>
+          <label htmlFor="">password</label>
+          <input
+            name="password"
+            type="text"
+            onChange={(e) => setPassword(e.target.value)}
             style={{ margin: "10px", padding: "10px" }}
           />
         </div>
