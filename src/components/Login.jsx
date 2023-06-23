@@ -1,22 +1,27 @@
-import axios from "axios";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { login } from "../features/actions/userActions";
+import { useDispatch, useSelector } from "react-redux";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const LoginUser = (e) => {
     e.preventDefault();
-    axios
-      .post("http://localhost:7070/api/user/login", { email, password })
-      .then((res) => {
-        alert(res.data.message);
-        // navigate("/chatbox");
-      })
-      .catch((err) => console.log(err));
+    dispatch(login({ email, password }));
   };
+
+  const { isAuthenticated } = useSelector((state) => state.user);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      alert("Logged In Successfully");
+      navigate("/chatbox");
+    }
+  }, [isAuthenticated, navigate]);
 
   return (
     <div

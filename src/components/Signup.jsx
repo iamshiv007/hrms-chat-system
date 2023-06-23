@@ -1,6 +1,7 @@
-import axios from "axios";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { register } from "../features/actions/userActions";
+import { useDispatch, useSelector } from "react-redux";
 
 const Signup = () => {
   const [name, setName] = useState("");
@@ -9,22 +10,21 @@ const Signup = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const signupUser = (e) => {
     e.preventDefault();
-    axios
-      .post("http://localhost:7070/api/user/new", {
-        fullName: name,
-        email,
-        password,
-        confirmPassword,
-      })
-      .then((res) => {
-        alert(res.data.message);
-        // navigate("/chatbox");
-      })
-      .catch((err) => alert(err.response.data.message));
+    dispatch(register({ fullName: name, email, password, confirmPassword }));
   };
+
+  const { isAuthenticated } = useSelector((state) => state.user);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      alert("Registered Successfully");
+      navigate("/chatbox");
+    }
+  }, [isAuthenticated, navigate]);
 
   return (
     <div
