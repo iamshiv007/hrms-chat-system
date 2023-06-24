@@ -7,10 +7,11 @@ export const login = (userData) => async (dispatch) => {
     dispatch(loginStart());
     try {
         // Make API request for login
-        const { data } = await axios.post("http://localhost:7070/api/user/login", userData);
+        const { data } = await axios.post("https://hrms-backend-iamshiv007.vercel.app/api/user/login", userData);
         dispatch(loginSuccess(data));
     } catch (error) {
-        dispatch(loginFailed(error.message));
+        alert(error.response.data.message)
+        dispatch(loginFailed(error.response.data.message));
     }
 };
 
@@ -19,10 +20,11 @@ export const register = (userData) => async (dispatch) => {
     dispatch(signupStart());
     try {
         // Make API request for signup
-        const { data } = await axios.post("http://localhost:7070/api/user/register", userData);
+        const { data } = await axios.post("https://hrms-backend-iamshiv007.vercel.app/api/user/register", userData);
         dispatch(signupSuccess(data));
     } catch (error) {
-        dispatch(signupFailed(error.message));
+        alert(error.response.data.message)
+        dispatch(signupFailed(error.response.data.message));
     }
 };
 
@@ -32,11 +34,12 @@ export const loadUser = () => async (dispatch) => {
     dispatch(userLoadStart())
     try {
         // Make API request for load user
-        const { data } = await axios.get(`http://localhost:7070/api/user/me`)
+        const { data } = await axios.get(`https://hrms-backend-iamshiv007.vercel.app/api/user/me`)
         dispatch(userLoadSuccess(data))
 
     } catch (error) {
-        dispatch(userLoadFailed(error.message))
+        alert(error.response.data.message)
+        dispatch(userLoadFailed(error.response.data.message))
     }
 }
 
@@ -45,10 +48,11 @@ export const getAllUsers = () => async (dispatch) => {
     dispatch(allUsersRequest())
     try {
         // Make API request for load user
-        const { data } = await axios.get(`http://localhost:7070/api/users`)
+        const { data } = await axios.get(`https://hrms-backend-iamshiv007.vercel.app/api/users`)
         dispatch(allUsersSuccess(data))
 
     } catch (error) {
-        dispatch(allUsersFailed(error.message))
+        alert(error.response.data.message)
+        dispatch(allUsersFailed(error.response.data.message))
     }
 }

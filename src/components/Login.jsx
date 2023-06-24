@@ -27,7 +27,7 @@ const Login = () => {
     <div
       style={{
         background: "pink",
-        width: "40%",
+        width: "60%",
         margin: "auto",
         padding: "20px",
         borderRadius: "5px",

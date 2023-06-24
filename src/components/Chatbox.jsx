@@ -18,7 +18,7 @@ const Chatbox = () => {
   const { users } = useSelector((state) => state.users);
 
   useEffect(() => {
-    socket = io.connect("http://localhost:7070");
+    socket = io.connect("https://hrms-backend-iamshiv007.vercel.app");
     dispatch(getAllUsers());
   }, [dispatch]);
 
@@ -27,7 +27,7 @@ const Chatbox = () => {
 
     if (receiver && receiver !== "") {
       axios
-        .post("http://localhost:7070/api/messages/two", {
+        .post("https://hrms-backend-iamshiv007.vercel.app/api/messages/two", {
           sender: user?._id,
           receiver: sessionStorage.getItem("receiver"),
         })
@@ -52,7 +52,7 @@ const Chatbox = () => {
       });
 
       axios
-        .post("http://localhost:7070/api/message/new", {
+        .post("https://hrms-backend-iamshiv007.vercel.app/api/message/new", {
           sender: user?._id,
           senderName: user?.fullName,
           receiver,
