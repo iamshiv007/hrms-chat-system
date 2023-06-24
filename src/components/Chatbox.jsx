@@ -3,30 +3,24 @@ import React, { Fragment, useEffect, useState } from "react";
 import ChatIcon from "../assets/ChatIcon.ico";
 import "./Chatbox.css";
 import io from "socket.io-client";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllUsers } from "../features/actions/userActions";
 var socket;
 
 const Chatbox = () => {
   const [isChatBox, setIsChatBox] = useState(false);
   const [messages, setMessages] = useState([]);
-  const [users, setUsers] = useState([]);
   const [message, setMessage] = useState("");
-  const [sender, setSender] = useState();
-  const [senderName, setsenderName] = useState("");
   const [receiver, setReceiver] = useState("");
+  const dispatch = useDispatch();
+
+  const { user } = useSelector((state) => state.user);
+  const { users } = useSelector((state) => state.users);
 
   useEffect(() => {
     socket = io.connect("http://localhost:7070");
-
-    setSender(sessionStorage.getItem("_id"));
-    setsenderName(sessionStorage.getItem("name"));
-
-    axios
-      .get("http://localhost:7070/api/users")
-      .then((res) => {
-        setUsers(res.data.users);
-      })
-      .catch((err) => console.log(err.response.data.message));
-  }, []);
+    dispatch(getAllUsers());
+  }, [dispatch]);
 
   useEffect(() => {
     setReceiver(sessionStorage.getItem("receiver"));
@@ -34,14 +28,15 @@ const Chatbox = () => {
     if (receiver && receiver !== "") {
       axios
         .post("http://localhost:7070/api/messages/two", {
-          sender: sessionStorage.getItem("_id"),
+          sender: user?._id,
           receiver: sessionStorage.getItem("receiver"),
         })
         .then((res) => {
+          console.log(res.data.messages);
           setMessages(res.data.messages);
         });
     }
-  }, [receiver]);
+  }, [receiver, user?._id]);
 
   const sendMessage = (e) => {
     if (e.key === "Enter" && message !== "") {
@@ -49,16 +44,25 @@ const Chatbox = () => {
         return alert("Select a receiver");
       }
 
+      console.log({
+        sender: user?._id,
+        senderName: user.fullName,
+        receiver,
+        message,
+      });
+
       axios
         .post("http://localhost:7070/api/message/new", {
-          sender,
+          sender: user?._id,
+          senderName: user?.fullName,
           receiver,
           message,
         })
         .then((res) => {
           socket.emit("send message", {
             message,
-            sender: { _id: sender, name: senderName },
+            sender: user?._id,
+            senderName: user?.fullName,
             receiver,
           });
           setMessage("");
@@ -71,9 +75,9 @@ const Chatbox = () => {
     socket.on("message", (payload) => {
       console.log("run");
       if (
-        sender === payload.sender._id ||
-        (sender === payload.receiver &&
-          sessionStorage.getItem("receiver") === payload.sender._id)
+        user?._id === payload.sender ||
+        (user?._id === payload.receiver &&
+          sessionStorage.getItem("receiver") === payload.sender)
       ) {
         setMessages([...messages, payload]);
       }
@@ -94,53 +98,23 @@ const Chatbox = () => {
           <div>
             <img style={{ width: "20px" }} src={ChatIcon} alt="" />
           </div>
+
           <div>
             Inbox{" "}
             <span>
-              <select
-                onChange={(e) => {
-                  setReceiver(e.target.value);
-                  sessionStorage.setItem("receiver", e.target.value);
-                }}
-                name="users"
-                id=""
-                value={receiver}
-              >
-                <option value="">Select</option>
-                {users
-                  .filter((user) => user._id !== sender)
-                  .map((user, key) => (
-                    <option key={key} value={user._id}>
-                      {user.name}
-                    </option>
-                  ))}
-              </select>
+              <UsersComp
+                users={users}
+                setReceiver={setReceiver}
+                receiver={receiver}
+                user={user}
+              />
             </span>
           </div>
         </div>
 
         <div>
-          <div className="chatings">
-            {messages.map((message, key) =>
-              sender !== message.sender._id ? (
-                <div key={key} className="chat">
-                  <p className="name">{message.sender.name}</p>
-                  <div>
-                    <div className="avatar">
-                      {message.sender.name.split("")[0]}
-                    </div>
-                    <p className="message">{message.message}</p>
-                  </div>
-                </div>
-              ) : (
-                <div key={key} className="senderChat">
-                  <div>
-                    <p className="message">{message.message}</p>
-                  </div>
-                </div>
-              )
-            )}
-          </div>
+          <Chatings messages={messages} user={user} />
+
           <div className="inputBox">
             <input
               onChange={(e) => setMessage(e.target.value)}
@@ -157,3 +131,50 @@ const Chatbox = () => {
 };
 
 export default Chatbox;
+
+const UsersComp = ({ users, setReceiver, receiver, user }) => {
+  return (
+    <select
+      onChange={(e) => {
+        setReceiver(e.target.value);
+        sessionStorage.setItem("receiver", e.target.value);
+      }}
+      name="users"
+      id=""
+      value={receiver}
+    >
+      <option value="">Select</option>
+      {users
+        .filter((oneuser) => oneuser?._id !== user?._id)
+        .map((oneuser, key) => (
+          <option key={key} value={oneuser?._id}>
+            {oneuser.fullName}
+          </option>
+        ))}
+    </select>
+  );
+};
+
+const Chatings = ({ messages, user }) => {
+  return (
+    <div className="chatings">
+      {messages.map((message, key) =>
+        user?._id !== message.sender ? (
+          <div key={key} className="chat">
+            <p className="name">{message.senderName}</p>
+            <div>
+              <div className="avatar">{message.senderName.split("")[0]}</div>
+              <p className="message">{message.message}</p>
+            </div>
+          </div>
+        ) : (
+          <div key={key} className="senderChat">
+            <div>
+              <p className="message">{message.message}</p>
+            </div>
+          </div>
+        )
+      )}
+    </div>
+  );
+};
