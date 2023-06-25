@@ -18,7 +18,9 @@ const Chatbox = () => {
   const { users } = useSelector((state) => state.users);
 
   useEffect(() => {
-    socket = io.connect("https://hrms-backend-iamshiv007.vercel.app");
+    socket = io.connect("https://hrms-backend-iamshiv007.vercel.app", {
+      transports: ["websocket"],
+    });
     dispatch(getAllUsers());
   }, [dispatch]);
 
