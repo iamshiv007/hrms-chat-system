@@ -1,10 +1,14 @@
-import axios from "axios";
+// import axios from "axios";
 import React, { Fragment, useEffect, useState } from "react";
 import ChatIcon from "../assets/ChatIcon.ico";
 import "./Chatbox.css";
 import io from "socket.io-client";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllUsers } from "../features/actions/userActions";
+import {
+  newMessage,
+  twoPersonMessages,
+} from "../features/actions/messageActions";
 var socket;
 
 const Chatbox = () => {
@@ -16,9 +20,10 @@ const Chatbox = () => {
 
   const { user } = useSelector((state) => state.user);
   const { users } = useSelector((state) => state.users);
+  const { messages: myMessages } = useSelector((state) => state.messages);
 
   useEffect(() => {
-    socket = io.connect("https://hrms-backend-iamshiv007.vercel.app", {
+    socket = io.connect("http://localhost:7070", {
       transports: ["websocket"],
     });
     dispatch(getAllUsers());
@@ -28,17 +33,22 @@ const Chatbox = () => {
     setReceiver(sessionStorage.getItem("receiver"));
 
     if (receiver && receiver !== "") {
-      axios
-        .post("https://hrms-backend-iamshiv007.vercel.app/api/messages/two", {
+      dispatch(
+        twoPersonMessages({
           sender: user?._id,
           receiver: sessionStorage.getItem("receiver"),
         })
-        .then((res) => {
-          console.log(res.data.messages);
-          setMessages(res.data.messages);
-        });
+      );
+      // axios.post("http://localhost:7070/api/messages/two", {}).then((res) => {
+      //   console.log(res.data.messages);
+      //   setMessages(res.data.messages);
+      // });
     }
   }, [receiver, user?._id]);
+
+  useEffect(() => {
+    setMessages(myMessages);
+  }, [myMessages]);
 
   const sendMessage = (e) => {
     if (e.key === "Enter" && message !== "") {
@@ -46,40 +56,39 @@ const Chatbox = () => {
         return alert("Select a receiver");
       }
 
-      console.log({
-        sender: user?._id,
-        senderName: user.fullName,
+      dispatch(newMessage({ sender: user?._id, receiver, message }));
+      socket.emit("send message", {
+        sender: { _id: user?._id, fullName: user?.fullName },
         receiver,
         message,
       });
-
-      axios
-        .post("https://hrms-backend-iamshiv007.vercel.app/api/message/new", {
-          sender: user?._id,
-          senderName: user?.fullName,
-          receiver,
-          message,
-        })
-        .then((res) => {
-          socket.emit("send message", {
-            message,
-            sender: user?._id,
-            senderName: user?.fullName,
-            receiver,
-          });
-          setMessage("");
-        })
-        .catch((err) => console.log(err.response.data.message));
+      setMessage("");
+      // axios
+      //   .post("http://localhost:7070/api/message/new", {
+      //     sender: user?._id,
+      //     receiver,
+      //     message,
+      //   })
+      //   .then((res) => {
+      //     socket.emit("send message", {
+      //       sender: { _id: user?._id, fullName: user?.fullName },
+      //       receiver,
+      //       message,
+      //     });
+      //     setMessage("");
+      //   })
+      //   .catch((err) => console.log(err.response.data.message));
     }
   };
 
   useEffect(() => {
+    console.log(messages);
     socket.on("message", (payload) => {
       console.log("run");
       if (
-        user?._id === payload.sender ||
+        user?._id === payload.sender._id ||
         (user?._id === payload.receiver &&
-          sessionStorage.getItem("receiver") === payload.sender)
+          sessionStorage.getItem("receiver") === payload.sender._id)
       ) {
         setMessages([...messages, payload]);
       }
@@ -160,12 +169,14 @@ const UsersComp = ({ users, setReceiver, receiver, user }) => {
 const Chatings = ({ messages, user }) => {
   return (
     <div className="chatings">
-      {messages.map((message, key) =>
-        user?._id !== message.sender ? (
+      {messages.map((message, key) => {
+        return user?._id !== message.sender._id ? (
           <div key={key} className="chat">
-            <p className="name">{message.senderName}</p>
+            <p className="name">{message.sender.fullName}</p>
             <div>
-              <div className="avatar">{message.senderName.split("")[0]}</div>
+              <div className="avatar">
+                {message.sender.fullName.split("")[0]}
+              </div>
               <p className="message">{message.message}</p>
             </div>
           </div>
@@ -175,8 +186,8 @@ const Chatings = ({ messages, user }) => {
               <p className="message">{message.message}</p>
             </div>
           </div>
-        )
-      )}
+        );
+      })}
     </div>
   );
 };
