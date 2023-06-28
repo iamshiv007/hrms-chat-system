@@ -23,7 +23,7 @@ const Chatbox = () => {
   const { messages: myMessages } = useSelector((state) => state.messages);
 
   useEffect(() => {
-    socket = io.connect("http://localhost:7070", {
+    socket = io.connect(process.env.REACT_APP_BACKEND_URL, {
       transports: ["websocket"],
     });
     dispatch(getAllUsers());
@@ -39,10 +39,6 @@ const Chatbox = () => {
           receiver: sessionStorage.getItem("receiver"),
         })
       );
-      // axios.post("http://localhost:7070/api/messages/two", {}).then((res) => {
-      //   console.log(res.data.messages);
-      //   setMessages(res.data.messages);
-      // });
     }
   }, [receiver, user?._id]);
 
@@ -63,21 +59,6 @@ const Chatbox = () => {
         message,
       });
       setMessage("");
-      // axios
-      //   .post("http://localhost:7070/api/message/new", {
-      //     sender: user?._id,
-      //     receiver,
-      //     message,
-      //   })
-      //   .then((res) => {
-      //     socket.emit("send message", {
-      //       sender: { _id: user?._id, fullName: user?.fullName },
-      //       receiver,
-      //       message,
-      //     });
-      //     setMessage("");
-      //   })
-      //   .catch((err) => console.log(err.response.data.message));
     }
   };
 

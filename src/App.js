@@ -12,7 +12,7 @@ const App = () => {
   const dispatch = useDispatch()
 
   useEffect(() => {
-
+    console.log(process.env.REACT_APP_BACKEND_URL)
     dispatch(loadUser())
 
   }, [dispatch]);

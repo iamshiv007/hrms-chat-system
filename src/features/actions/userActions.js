@@ -7,7 +7,7 @@ export const login = (userData) => async (dispatch) => {
     dispatch(loginStart());
     try {
         // Make API request for login
-        const { data } = await axios.post("http://localhost:7070/api/user/login", userData);
+        const { data } = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/user/login`, userData);
         dispatch(loginSuccess(data));
     } catch (error) {
         alert(error.response?.data.message)
@@ -20,7 +20,7 @@ export const register = (userData) => async (dispatch) => {
     dispatch(signupStart());
     try {
         // Make API request for signup
-        const { data } = await axios.post("http://localhost:7070/api/user/register", userData);
+        const { data } = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/user/register`, userData);
         dispatch(signupSuccess(data));
     } catch (error) {
         alert(error.response.data.message)
@@ -34,7 +34,7 @@ export const loadUser = () => async (dispatch) => {
     dispatch(userLoadStart())
     try {
         // Make API request for load user
-        const { data } = await axios.get(`http://localhost:7070/api/user/me`)
+        const { data } = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/user/me`)
         dispatch(userLoadSuccess(data))
 
     } catch (error) {
@@ -48,7 +48,7 @@ export const getAllUsers = () => async (dispatch) => {
     dispatch(allUsersRequest())
     try {
         // Make API request for load user
-        const { data } = await axios.get(`http://localhost:7070/api/users`)
+        const { data } = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/users`)
         dispatch(allUsersSuccess(data))
 
     } catch (error) {
