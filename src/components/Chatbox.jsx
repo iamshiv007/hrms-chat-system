@@ -26,6 +26,11 @@ const Chatbox = () => {
     socket = io.connect(process.env.REACT_APP_BACKEND_URL, {
       transports: ["websocket"],
     });
+
+    socket.on("connect_error", (err) => {
+      console.log(`connect_error due to ${err.message}`);
+    });
+
     dispatch(getAllUsers());
   }, [dispatch]);
 
