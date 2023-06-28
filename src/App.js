@@ -12,6 +12,7 @@ const App = () => {
   const dispatch = useDispatch()
 
   useEffect(() => {
+    console.log("enviroment change")
     dispatch(loadUser())
 
   }, [dispatch]);
