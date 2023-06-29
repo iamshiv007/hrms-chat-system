@@ -25,6 +25,7 @@ const Chatbox = () => {
   useEffect(() => {
     socket = io.connect(process.env.REACT_APP_BACKEND_URL, {
       transports: ["websocket"],
+      rejectUnauthorized: false
     });
 
     socket.on("connect_error", (err) => {
