@@ -68,7 +68,6 @@ const Chatbox = () => {
   };
 
   useEffect(() => {
-    console.log(messages);
     socket.on("message", (payload) => {
       console.log("run");
       if (
