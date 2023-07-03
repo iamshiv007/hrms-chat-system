@@ -2,14 +2,14 @@
 import React, { Fragment, useEffect, useState } from "react";
 import ChatIcon from "../assets/ChatIcon.ico";
 import "./Chatbox.css";
-import io from "socket.io-client";
+// import io from "socket.io-client";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllUsers } from "../features/actions/userActions";
 import {
   newMessage,
   twoPersonMessages,
 } from "../features/actions/messageActions";
-var socket;
+// var socket;
 
 const Chatbox = () => {
   const [isChatBox, setIsChatBox] = useState(false);
@@ -23,14 +23,14 @@ const Chatbox = () => {
   const { messages: myMessages } = useSelector((state) => state.messages);
 
   useEffect(() => {
-    socket = io.connect(process.env.REACT_APP_BACKEND_URL, {
-      transports: ["websocket"],
-      rejectUnauthorized: false
-    });
+    // socket = io.connect(process.env.REACT_APP_BACKEND_URL, {
+    //   transports: ["websocket"],
+    //   rejectUnauthorized: false
+    // });
 
-    socket.on("connect_error", (err) => {
-      console.log(`connect_error due to ${err}`);
-    });
+    // socket.on("connect_error", (err) => {
+    //   console.log(`connect_error due to ${err}`);
+    // });
 
     dispatch(getAllUsers());
   }, [dispatch]);
