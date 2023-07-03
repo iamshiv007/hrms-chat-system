@@ -59,27 +59,27 @@ const Chatbox = () => {
       }
 
       dispatch(newMessage({ sender: user?._id, receiver, message }));
-      socket.emit("send message", {
-        sender: { _id: user?._id, fullName: user?.fullName },
-        receiver,
-        message,
-      });
+      // socket.emit("send message", {
+      //   sender: { _id: user?._id, fullName: user?.fullName },
+      //   receiver,
+      //   message,
+      // });
       setMessage("");
     }
   };
 
-  useEffect(() => {
-    socket.on("message", (payload) => {
-      console.log("run");
-      if (
-        user?._id === payload.sender._id ||
-        (user?._id === payload.receiver &&
-          sessionStorage.getItem("receiver") === payload.sender._id)
-      ) {
-        setMessages([...messages, payload]);
-      }
-    });
-  });
+  // useEffect(() => {
+  //   socket.on("message", (payload) => {
+  //     console.log("run");
+  //     if (
+  //       user?._id === payload.sender._id ||
+  //       (user?._id === payload.receiver &&
+  //         sessionStorage.getItem("receiver") === payload.sender._id)
+  //     ) {
+  //       setMessages([...messages, payload]);
+  //     }
+  //   });
+  // });
 
   return (
     <Fragment>
